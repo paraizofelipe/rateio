@@ -100,20 +100,29 @@ Para **cada uma das 3 collections**:
 2. Confirme que existe uma plataforma **Android** com package name **`dev.paraizo.cost`**.
 3. Se não existir, clique **Add platform → Android App**, name `cost`, package `dev.paraizo.cost`.
 
-## 7. Coletar os valores para o app (usados na task T4)
+## 7. Configurar os IDs no app (`local.properties`)
 
-Ao final, você deve ter estes 5 valores. Eles vão para `app/src/main/java/dev/paraizo/cost/data/AppwriteConfig.kt`:
+Os IDs **não ficam no código-fonte** — são lidos de `local.properties` (não versionado) via `BuildConfig`. Em cada máquina onde for compilar, adicione estas linhas ao `local.properties` na raiz do projeto:
 
-| Constante           | Onde obter                                   | Valor |
-|---------------------|----------------------------------------------|-------|
-| `ENDPOINT`          | fixo                                         | `https://backend.paraizo.dev/v1` |
-| `PROJECT_ID`        | fixo (já conhecido)                          | `6a248ab90027fe50cfbf` |
-| `DATABASE_ID`       | passo 3                                       | `6a249b5e00222dff6baf` |
-| `COLLECTION_GRUPOS` | passo 4.1                                     | `6a249ba30003f86d75e1` |
-| `COLLECTION_PESSOAS`| passo 4.2                                     | `6a249bf8000bf31fb56b` |
-| `COLLECTION_GASTOS` | passo 4.3                                     | `6a249c89001da73ade1a` |
+```properties
+appwrite.projectId=6a248ab90027fe50cfbf
+appwrite.databaseId=6a249b5e00222dff6baf
+appwrite.collectionGrupos=6a249ba30003f86d75e1
+appwrite.collectionPessoas=6a249bf8000bf31fb56b
+appwrite.collectionGastos=6a249c89001da73ade1a
+```
 
-> Preencha os 4 IDs em branco e me envie — eu uso na implementação da T4. (Database/Collection IDs **não** são segredo de segurança como uma API key, então pode colar aqui; mesmo assim, o acesso fica protegido pelas permissões do passo 5 + login.)
+O endpoint (`https://backend.paraizo.dev/v1`) é público e fica fixo em `AppwriteConfig.kt`.
+
+> ⚠️ Sem essas chaves no `local.properties`, o build compila mas o `BuildConfig` fica com strings vazias e o app **não conecta**. (Nesta máquina já estão configuradas.)
+
+| Valor               | Origem    | Chave em local.properties     |
+|---------------------|-----------|-------------------------------|
+| Project ID          | conhecido | `appwrite.projectId`          |
+| Database ID         | passo 3   | `appwrite.databaseId`         |
+| Collection grupos   | passo 4.1 | `appwrite.collectionGrupos`   |
+| Collection pessoas  | passo 4.2 | `appwrite.collectionPessoas`  |
+| Collection gastos   | passo 4.3 | `appwrite.collectionGastos`   |
 
 ---
 
