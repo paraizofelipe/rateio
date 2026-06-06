@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.appwrite.sdk)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
