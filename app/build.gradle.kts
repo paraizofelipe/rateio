@@ -1,8 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+// IDs do Appwrite vêm de local.properties (não versionado). Ver docs/appwrite-setup.md.
+val appwriteProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) FileInputStream(f).use { load(it) }
+}
+fun appwriteProp(key: String): String = appwriteProps.getProperty(key, "")
 
 android {
     namespace = "dev.paraizo.cost"
@@ -14,6 +24,12 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "APPWRITE_PROJECT_ID", "\"${appwriteProp("appwrite.projectId")}\"")
+        buildConfigField("String", "APPWRITE_DATABASE_ID", "\"${appwriteProp("appwrite.databaseId")}\"")
+        buildConfigField("String", "APPWRITE_COLLECTION_GRUPOS", "\"${appwriteProp("appwrite.collectionGrupos")}\"")
+        buildConfigField("String", "APPWRITE_COLLECTION_PESSOAS", "\"${appwriteProp("appwrite.collectionPessoas")}\"")
+        buildConfigField("String", "APPWRITE_COLLECTION_GASTOS", "\"${appwriteProp("appwrite.collectionGastos")}\"")
     }
 
     buildTypes {
@@ -33,6 +49,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
