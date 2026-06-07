@@ -6,9 +6,9 @@ import dev.paraizo.cost.domain.Pessoa
 import io.appwrite.ID
 import io.appwrite.Query
 
-class PessoaRepository(private val client: AppwriteClient) {
+class PessoaRepository(private val client: AppwriteClient) : PessoaRepo {
 
-    suspend fun create(pessoa: Pessoa): Pessoa {
+    override suspend fun create(pessoa: Pessoa): Pessoa {
         val doc = client.databases.createDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_PESSOAS,
@@ -19,7 +19,7 @@ class PessoaRepository(private val client: AppwriteClient) {
         return pessoaFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun listByGroup(groupId: String): List<Pessoa> {
+    override suspend fun listByGroup(groupId: String): List<Pessoa> {
         val result = client.databases.listDocuments(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_PESSOAS,
@@ -29,7 +29,7 @@ class PessoaRepository(private val client: AppwriteClient) {
         return result.documents.map { pessoaFromDocument(it.id, it.data as Map<String, Any>) }
     }
 
-    suspend fun update(pessoa: Pessoa): Pessoa {
+    override suspend fun update(pessoa: Pessoa): Pessoa {
         val doc = client.databases.updateDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_PESSOAS,

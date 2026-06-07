@@ -13,11 +13,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.paraizo.cost.data.AppwriteClient
 import dev.paraizo.cost.data.GrupoRepository
+import dev.paraizo.cost.data.PessoaRepository
 import dev.paraizo.cost.ui.auth.AuthState
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.auth.LoginScreen
 import dev.paraizo.cost.ui.grupos.GruposScreen
 import dev.paraizo.cost.ui.grupos.GruposViewModel
+import dev.paraizo.cost.ui.pessoas.PessoasScreen
+import dev.paraizo.cost.ui.pessoas.PessoasViewModel
 
 @Composable
 fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
@@ -72,8 +75,26 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 onSelecionar = { groupId -> navController.navigate(Routes.pessoas(groupId)) }
             )
         }
-        composable(Routes.PESSOAS) {
-            Text("Pessoas")
+        composable(Routes.PESSOAS) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId") ?: return@composable
+            val pessoasViewModel: PessoasViewModel = viewModel(
+                key = groupId,
+                factory = viewModelFactory {
+                    initializer {
+                        PessoasViewModel(PessoaRepository(appwriteClient), groupId)
+                    }
+                }
+            )
+            val pessoasState by pessoasViewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(groupId) {
+                pessoasViewModel.load()
+            }
+
+            PessoasScreen(
+                state = pessoasState,
+                onSalvar = { nome, rendaCentavos -> pessoasViewModel.salvar(nome, rendaCentavos) }
+            )
         }
         composable(Routes.GASTOS) {
             Text("Gastos")
