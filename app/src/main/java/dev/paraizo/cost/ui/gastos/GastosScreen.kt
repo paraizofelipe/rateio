@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -23,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -52,7 +54,8 @@ import java.time.format.DateTimeFormatter
 fun GastosScreen(
     state: GastosUiState,
     onSelecionarCompetencia: (String) -> Unit,
-    onCriar: (descricao: String, valorCentavos: Long, pagadorId: String, competencia: String) -> Unit
+    onCriar: (descricao: String, valorCentavos: Long, pagadorId: String, competencia: String) -> Unit,
+    onVerSettle: (competencia: String) -> Unit = {}
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var descricaoInput by rememberSaveable { mutableStateOf("") }
@@ -64,7 +67,17 @@ fun GastosScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Gastos") })
+            TopAppBar(
+                title = { Text("Gastos") },
+                actions = {
+                    IconButton(
+                        onClick = { onVerSettle(competencia) },
+                        enabled = state is GastosUiState.Ready
+                    ) {
+                        Icon(Icons.Default.List, contentDescription = "Acerto de contas")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             if (state is GastosUiState.Ready) {

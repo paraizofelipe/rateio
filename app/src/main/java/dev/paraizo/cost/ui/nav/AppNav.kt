@@ -1,6 +1,5 @@
 package dev.paraizo.cost.ui.nav
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +23,8 @@ import dev.paraizo.cost.ui.grupos.GruposScreen
 import dev.paraizo.cost.ui.grupos.GruposViewModel
 import dev.paraizo.cost.ui.pessoas.PessoasScreen
 import dev.paraizo.cost.ui.pessoas.PessoasViewModel
+import dev.paraizo.cost.ui.settle.SettleScreen
+import dev.paraizo.cost.ui.settle.SettleViewModel
 
 @Composable
 fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
@@ -124,11 +125,34 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 onSelecionarCompetencia = { gastosViewModel.selecionarCompetencia(it) },
                 onCriar = { descricao, valorCentavos, pagadorId, competencia ->
                     gastosViewModel.criar(descricao, valorCentavos, pagadorId, competencia)
+                },
+                onVerSettle = { competencia ->
+                    navController.navigate(Routes.settle(groupId, competencia))
                 }
             )
         }
-        composable(Routes.SETTLE) {
-            Text("Settle")
+        composable(Routes.SETTLE) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId") ?: return@composable
+            val competencia = backStackEntry.arguments?.getString("competencia") ?: return@composable
+            val settleViewModel: SettleViewModel = viewModel(
+                key = groupId,
+                factory = viewModelFactory {
+                    initializer {
+                        SettleViewModel(
+                            PessoaRepository(appwriteClient),
+                            GastoRepository(appwriteClient),
+                            groupId
+                        )
+                    }
+                }
+            )
+            val settleState by settleViewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(competencia) {
+                settleViewModel.carregar(competencia)
+            }
+
+            SettleScreen(state = settleState)
         }
     }
 }
