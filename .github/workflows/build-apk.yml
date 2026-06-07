@@ -1,0 +1,70 @@
+name: Build APK e publicar release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {} # permite rodar manualmente pela aba Actions
+
+permissions:
+  contents: write # necessario para criar a release e anexar o APK
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      # O gradle.properties versionado fixa org.gradle.java.home no JBR do
+      # Android Studio (caminho que so existe na maquina local). No runner
+      # usamos o JDK 17 configurado acima, entao removemos esse pin.
+      - name: Remover pin local do java.home
+        run: sed -i '/org.gradle.java.home/d' gradle.properties
+
+      # IDs do Appwrite vivem em local.properties (gitignored). Recriamos a
+      # partir dos Secrets do repositorio. sdk.dir nao e necessario: o runner
+      # ja expoe o Android SDK via ANDROID_HOME.
+      - name: Gerar local.properties
+        run: |
+          {
+            echo "appwrite.projectId=${{ secrets.APPWRITE_PROJECT_ID }}"
+            echo "appwrite.databaseId=${{ secrets.APPWRITE_DATABASE_ID }}"
+            echo "appwrite.collectionGrupos=${{ secrets.APPWRITE_COLLECTION_GRUPOS }}"
+            echo "appwrite.collectionPessoas=${{ secrets.APPWRITE_COLLECTION_PESSOAS }}"
+            echo "appwrite.collectionGastos=${{ secrets.APPWRITE_COLLECTION_GASTOS }}"
+          } > local.properties
+
+      - name: Tornar o gradlew executavel
+        run: chmod +x ./gradlew
+
+      - name: Rodar testes unitarios
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Compilar APK de debug
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Renomear APK com a versao
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             dist/cost-debug-v1.0.${{ github.run_number }}.apk
+
+      - name: Publicar release com o APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Cost v1.0.${{ github.run_number }}
+          generate_release_notes: true
+          files: dist/cost-debug-v1.0.${{ github.run_number }}.apk
