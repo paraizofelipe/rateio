@@ -158,7 +158,12 @@ fun GastosScreen(
             if (state is GastosUiState.Ready) {
                 BrandFab(onClick = { abrirCriacao() }, icon = Icons.Default.Add, contentDescription = "Adicionar gasto")
             }
-        }
+        },
+        bottomBar = {
+            if (state is GastosUiState.Ready) {
+                OrcamentoBar(orcamento = state.orcamento)
+            }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
