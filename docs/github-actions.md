@@ -31,6 +31,7 @@ Cadastrar em **Settings → Secrets and variables → Actions → New repository
 | `APPWRITE_COLLECTION_GRUPOS` | `appwrite.collectionGrupos` |
 | `APPWRITE_COLLECTION_PESSOAS` | `appwrite.collectionPessoas` |
 | `APPWRITE_COLLECTION_GASTOS` | `appwrite.collectionGastos` |
+| `APPWRITE_COLLECTION_RENDAS` | `appwrite.collectionRendas` |
 
 ## Instalar no celular
 

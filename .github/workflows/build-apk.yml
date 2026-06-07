@@ -45,6 +45,7 @@ jobs:
             echo "appwrite.collectionGrupos=${{ secrets.APPWRITE_COLLECTION_GRUPOS }}"
             echo "appwrite.collectionPessoas=${{ secrets.APPWRITE_COLLECTION_PESSOAS }}"
             echo "appwrite.collectionGastos=${{ secrets.APPWRITE_COLLECTION_GASTOS }}"
+            echo "appwrite.collectionRendas=${{ secrets.APPWRITE_COLLECTION_RENDAS }}"
           } > local.properties
 
       - name: Tornar o gradlew executavel
