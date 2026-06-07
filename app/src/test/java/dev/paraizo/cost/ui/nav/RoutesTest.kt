@@ -37,7 +37,7 @@ class RoutesTest {
     }
 
     @Test
-    fun routesSettleInterpolatesGroupId() {
-        assertEquals("grupos/g1/settle", Routes.settle("g1"))
+    fun routesSettleInterpolatesGroupIdAndCompetencia() {
+        assertEquals("grupos/g1/settle/2026-06", Routes.settle("g1", "2026-06"))
     }
 }
