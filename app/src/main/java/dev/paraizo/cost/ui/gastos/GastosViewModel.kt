@@ -7,6 +7,7 @@ import dev.paraizo.cost.data.PessoaRepo
 import dev.paraizo.cost.data.RendaMensalRepo
 import dev.paraizo.cost.domain.Gasto
 import dev.paraizo.cost.domain.Money
+import dev.paraizo.cost.domain.calcularOrcamento
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.CancellationException
@@ -144,6 +145,20 @@ class GastosViewModel(
     private suspend fun buildReady(competencia: String): GastosUiState.Ready {
         val gastos = gastoRepo.listByGroupAndCompetencia(groupId, competencia)
         val pessoas = pessoaRepo.listByGroup(groupId)
-        return GastosUiState.Ready(gastos = gastos, pessoas = pessoas, competencia = competencia)
+        val totalGasto = gastos.fold(Money.ZERO) { acc, g -> acc + g.valor }
+        // Base da renda: snapshot congelado da competência; se ainda não há, soma das rendas atuais.
+        val snapshot = rendaRepo.rendasDe(groupId, competencia)
+        val rendaTotalCents = if (snapshot.isNotEmpty()) {
+            snapshot.values.sum()
+        } else {
+            pessoas.fold(0L) { acc, p -> acc + p.renda.cents }
+        }
+        val orcamento = calcularOrcamento(Money(rendaTotalCents), totalGasto)
+        return GastosUiState.Ready(
+            gastos = gastos,
+            pessoas = pessoas,
+            competencia = competencia,
+            orcamento = orcamento,
+        )
     }
 }

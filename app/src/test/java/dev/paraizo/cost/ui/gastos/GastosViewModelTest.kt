@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import dev.paraizo.cost.domain.NivelOrcamento
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -185,6 +186,37 @@ class GastosViewModelTest {
         viewModel.sincronizarRendas("2026-06")
         testDispatcher.scheduler.advanceUntilIdle()
         assertEquals(mapOf("p1" to 8000L), rendaRepo.snapshots["2026-06"])
+    }
+
+    @Test
+    fun orcamentoUsaSnapshotQuandoExiste() = runTest(testDispatcher) {
+        // snapshot congelado: renda total 1000; gasto 600 = 60% -> ATENCAO
+        rendaRepo.snapshots = mutableMapOf("2026-06" to mapOf("p1" to 600L, "p2" to 400L))
+        gastoRepo.gastosPorCompetencia = mapOf(
+            "2026-06" to listOf(Gasto("b", "Luz", Money(600), "p1", "g1", "2026-06"))
+        )
+        viewModel.selecionarCompetencia("2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        val state = viewModel.state.value
+        assertTrue(state is GastosUiState.Ready)
+        assertEquals(Money(1000), state.orcamento.rendaTotal)
+        assertEquals(Money(600), state.orcamento.totalGasto)
+        assertEquals(Money(400), state.orcamento.restante)
+        assertEquals(NivelOrcamento.ATENCAO, state.orcamento.nivel)
+    }
+
+    @Test
+    fun orcamentoUsaRendaAtualQuandoSemSnapshot() = runTest(testDispatcher) {
+        pessoaRepo.pessoas = listOf(Pessoa("p1", "Ana", Money(1000), "g1"))
+        gastoRepo.gastosPorCompetencia = mapOf(
+            "2026-06" to listOf(Gasto("b", "Luz", Money(300), "p1", "g1", "2026-06"))
+        )
+        viewModel.selecionarCompetencia("2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        val state = viewModel.state.value
+        assertTrue(state is GastosUiState.Ready)
+        assertEquals(Money(1000), state.orcamento.rendaTotal)
+        assertEquals(NivelOrcamento.SAUDAVEL, state.orcamento.nivel)
     }
 }
 
