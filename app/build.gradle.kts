@@ -25,6 +25,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "APPWRITE_ENDPOINT", "\"${appwriteProp("appwrite.endpoint")}\"")
         buildConfigField("String", "APPWRITE_PROJECT_ID", "\"${appwriteProp("appwrite.projectId")}\"")
         buildConfigField("String", "APPWRITE_DATABASE_ID", "\"${appwriteProp("appwrite.databaseId")}\"")
         buildConfigField("String", "APPWRITE_COLLECTION_GRUPOS", "\"${appwriteProp("appwrite.collectionGrupos")}\"")

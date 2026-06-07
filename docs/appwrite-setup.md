@@ -124,6 +124,7 @@ Para **cada uma das 4 collections** (`grupos`, `pessoas`, `gastos`, `rendas_mens
 Os IDs **não ficam no código-fonte** — são lidos de `local.properties` (não versionado) via `BuildConfig`. Em cada máquina onde for compilar, adicione estas linhas ao `local.properties` na raiz do projeto:
 
 ```properties
+appwrite.endpoint=YOUR_APPWRITE_ENDPOINT
 appwrite.projectId=YOUR_PROJECT_ID
 appwrite.databaseId=YOUR_DATABASE_ID
 appwrite.collectionGrupos=YOUR_COLLECTION_GRUPOS
@@ -132,12 +133,13 @@ appwrite.collectionGastos=YOUR_COLLECTION_GASTOS
 appwrite.collectionRendas=<ID da collection rendas_mensais (passo 4.4)>
 ```
 
-O endpoint (`https://YOUR_APPWRITE_ENDPOINT/v1`) é público e fica fixo em `AppwriteConfig.kt`.
+O endpoint (ex.: `https://seu-host/v1`) também é lido de `local.properties` via `BuildConfig`, não fica no código-fonte.
 
 > ⚠️ Sem essas chaves no `local.properties`, o build compila mas o `BuildConfig` fica com strings vazias e o app **não conecta**. (Nesta máquina já estão configuradas.)
 
 | Valor               | Origem    | Chave em local.properties     |
 |---------------------|-----------|-------------------------------|
+| Endpoint            | conhecido | `appwrite.endpoint`           |
 | Project ID          | conhecido | `appwrite.projectId`          |
 | Database ID         | passo 3   | `appwrite.databaseId`         |
 | Collection grupos   | passo 4.1 | `appwrite.collectionGrupos`   |

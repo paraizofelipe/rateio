@@ -39,6 +39,7 @@ jobs:
       - name: Gerar local.properties
         run: |
           {
+            echo "appwrite.endpoint=${{ secrets.APPWRITE_ENDPOINT }}"
             echo "appwrite.projectId=${{ secrets.APPWRITE_PROJECT_ID }}"
             echo "appwrite.databaseId=${{ secrets.APPWRITE_DATABASE_ID }}"
             echo "appwrite.collectionGrupos=${{ secrets.APPWRITE_COLLECTION_GRUPOS }}"

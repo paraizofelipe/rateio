@@ -25,6 +25,7 @@ Cadastrar em **Settings → Secrets and variables → Actions → New repository
 
 | Secret | Conteúdo (ver `local.properties`) |
 |---|---|
+| `APPWRITE_ENDPOINT` | `appwrite.endpoint` |
 | `APPWRITE_PROJECT_ID` | `appwrite.projectId` |
 | `APPWRITE_DATABASE_ID` | `appwrite.databaseId` |
 | `APPWRITE_COLLECTION_GRUPOS` | `appwrite.collectionGrupos` |
