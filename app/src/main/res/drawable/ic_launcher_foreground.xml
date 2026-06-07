@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.70"
+        android:scaleY="0.70"
+        android:translateX="19.0"
+        android:translateY="19.35">
+        <!-- Cifrao branco: corpo em S -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="9"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M68,33 C68,24 60,18 50,18 C40,18 32,24 32,33 C32,43 41,46 50,49 C59,52 68,55 68,65 C68,75 60,81 50,81 C40,81 32,75 32,66" />
+        <!-- Cifrao branco: barra vertical -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="9"
+            android:strokeLineCap="round"
+            android:pathData="M50,8 L50,91" />
+    </group>
+</vector>
