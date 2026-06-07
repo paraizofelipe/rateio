@@ -80,11 +80,30 @@ Aba **Indexes** → **Create index**:
 
 > Esse índice composto cobre a consulta principal do app (gastos de um grupo num mês).
 
+### 4.4. Collection `rendas_mensais`  → anote como `COLLECTION_RENDAS`
+
+Guarda a **foto da renda** de cada pessoa por competência, congelando o rateio de meses já lançados (alterar a renda atual de uma pessoa não recalcula meses passados).
+
+| Key          | Tipo    | Size / Min | Required | Observação |
+|--------------|---------|------------|----------|------------|
+| groupId      | String  | 255        | ✅ Sim   | ID do documento em `grupos` |
+| competencia  | String  | 7          | ✅ Sim   | Mês no formato `YYYY-MM` |
+| pessoaId     | String  | 255        | ✅ Sim   | ID do documento em `pessoas` |
+| rendaCentavos| Integer | Min: `0`   | ✅ Sim   | Renda fotografada, em **centavos** |
+
+Aba **Indexes** → **Create index**:
+
+| Index Key                 | Type | Attributes |
+|---------------------------|------|------------|
+| `idx_group_competencia`   | Key  | `groupId` (ASC), `competencia` (ASC) |
+
+> Adicione `appwrite.collectionRendas=<ID>` ao `local.properties` (passo 7).
+
 ## 5. Permissões (decisão D1 — somente para o usuário logado)
 
 A ideia: **só o usuário autenticado** pode ler/escrever; visitantes (guests) não acessam nada.
 
-Para **cada uma das 3 collections**:
+Para **cada uma das 4 collections** (`grupos`, `pessoas`, `gastos`, `rendas_mensais`):
 
 1. Abra a collection → aba **Settings**.
 2. Em **Permissions**, clique **Add role** e adicione o role **Users** (= qualquer usuário autenticado).
@@ -110,6 +129,7 @@ appwrite.databaseId=YOUR_DATABASE_ID
 appwrite.collectionGrupos=YOUR_COLLECTION_GRUPOS
 appwrite.collectionPessoas=YOUR_COLLECTION_PESSOAS
 appwrite.collectionGastos=YOUR_COLLECTION_GASTOS
+appwrite.collectionRendas=<ID da collection rendas_mensais (passo 4.4)>
 ```
 
 O endpoint (`https://YOUR_APPWRITE_ENDPOINT/v1`) é público e fica fixo em `AppwriteConfig.kt`.
@@ -123,6 +143,7 @@ O endpoint (`https://YOUR_APPWRITE_ENDPOINT/v1`) é público e fica fixo em `App
 | Collection grupos   | passo 4.1 | `appwrite.collectionGrupos`   |
 | Collection pessoas  | passo 4.2 | `appwrite.collectionPessoas`  |
 | Collection gastos   | passo 4.3 | `appwrite.collectionGastos`   |
+| Collection rendas   | passo 4.4 | `appwrite.collectionRendas`   |
 
 ---
 
@@ -133,6 +154,7 @@ O endpoint (`https://YOUR_APPWRITE_ENDPOINT/v1`) é público e fica fixo em `App
 - [ ] Collection `grupos` com atributo `nome`
 - [ ] Collection `pessoas` com `nome`, `rendaCentavos`, `groupId` + índice `groupId`
 - [ ] Collection `gastos` com `descricao`, `valorCentavos`, `pagadorId`, `groupId`, `competencia` + índice composto
-- [ ] Permissões: role **Users** com CRUD nas 3 collections; **Any** ausente
+- [ ] Collection `rendas_mensais` com `groupId`, `competencia`, `pessoaId`, `rendaCentavos` + índice composto
+- [ ] Permissões: role **Users** com CRUD nas 4 collections; **Any** ausente
 - [ ] Plataforma Android `dev.paraizo.cost` presente
-- [ ] 4 IDs coletados (Database + 3 Collections)
+- [ ] 5 IDs coletados (Database + 4 Collections)

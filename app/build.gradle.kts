@@ -30,6 +30,7 @@ android {
         buildConfigField("String", "APPWRITE_COLLECTION_GRUPOS", "\"${appwriteProp("appwrite.collectionGrupos")}\"")
         buildConfigField("String", "APPWRITE_COLLECTION_PESSOAS", "\"${appwriteProp("appwrite.collectionPessoas")}\"")
         buildConfigField("String", "APPWRITE_COLLECTION_GASTOS", "\"${appwriteProp("appwrite.collectionGastos")}\"")
+        buildConfigField("String", "APPWRITE_COLLECTION_RENDAS", "\"${appwriteProp("appwrite.collectionRendas")}\"")
     }
 
     buildTypes {
@@ -60,6 +61,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.appwrite.sdk)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.lifecycle.viewmodel.ktx)

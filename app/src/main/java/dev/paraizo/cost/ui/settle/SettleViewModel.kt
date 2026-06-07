@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.paraizo.cost.data.GastoRepo
 import dev.paraizo.cost.data.PessoaRepo
+import dev.paraizo.cost.data.RendaMensalRepo
+import dev.paraizo.cost.domain.Money
 import dev.paraizo.cost.domain.settleUp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 class SettleViewModel(
     private val pessoaRepo: PessoaRepo,
     private val gastoRepo: GastoRepo,
+    private val rendaRepo: RendaMensalRepo,
     private val groupId: String,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -26,10 +29,18 @@ class SettleViewModel(
         viewModelScope.launch(dispatcher) {
             _state.value = SettleUiState.Loading
             try {
-                val pessoas = pessoaRepo.listByGroup(groupId)
-                if (pessoas.isEmpty()) {
+                val pessoasAtuais = pessoaRepo.listByGroup(groupId)
+                if (pessoasAtuais.isEmpty()) {
                     _state.value = SettleUiState.Blocked(BlockReason.SEM_PESSOAS)
                     return@launch
+                }
+                // Se a competência tem renda "fotografada", usa-a (rateio congelado);
+                // senão, usa a renda atual das pessoas (mês ainda sem lançamentos).
+                val snapshot = rendaRepo.rendasDe(groupId, competencia)
+                val pessoas = if (snapshot.isNotEmpty()) {
+                    pessoasAtuais.map { it.copy(renda = Money(snapshot[it.id] ?: it.renda.cents)) }
+                } else {
+                    pessoasAtuais
                 }
                 val rendaTotal = pessoas.sumOf { it.renda.cents }
                 if (rendaTotal == 0L) {

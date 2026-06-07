@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.paraizo.cost.data.GastoRepo
 import dev.paraizo.cost.data.PessoaRepo
+import dev.paraizo.cost.data.RendaMensalRepo
 import dev.paraizo.cost.domain.Gasto
 import dev.paraizo.cost.domain.Money
 import java.time.YearMonth
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class GastosViewModel(
     private val gastoRepo: GastoRepo,
     private val pessoaRepo: PessoaRepo,
+    private val rendaRepo: RendaMensalRepo,
     private val groupId: String,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -52,12 +54,76 @@ class GastosViewModel(
                     competencia = competencia
                 )
                 gastoRepo.create(gasto)
+                // Fotografa a renda das pessoas no primeiro gasto da competência,
+                // congelando o rateio deste mês (alterar a renda depois não o afeta).
+                val pessoas = pessoaRepo.listByGroup(groupId)
+                if (rendaRepo.rendasDe(groupId, competencia).isEmpty()) {
+                    rendaRepo.criarSnapshot(groupId, competencia, pessoas.associate { it.id to it.renda.cents })
+                }
                 val current = (_state.value as? GastosUiState.Ready)?.competencia ?: competenciaInicial
                 _state.value = buildReady(current)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 _state.value = GastosUiState.Error(e.message ?: "Erro ao criar gasto")
+            }
+        }
+    }
+
+    /** Re-fotografa as rendas da competência a partir das rendas atuais (corrige um mês já congelado). */
+    fun sincronizarRendas(competencia: String) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                val pessoas = pessoaRepo.listByGroup(groupId)
+                rendaRepo.limparSnapshot(groupId, competencia)
+                rendaRepo.criarSnapshot(groupId, competencia, pessoas.associate { it.id to it.renda.cents })
+                _state.value = buildReady(competencia)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.value = GastosUiState.Error(e.message ?: "Erro ao sincronizar rendas")
+            }
+        }
+    }
+
+    fun editar(id: String, descricao: String, valorCentavos: Long, pagadorId: String?, competencia: String) {
+        if (id.isBlank()) return
+        if (descricao.isBlank()) return
+        if (valorCentavos < 0) return
+        if (pagadorId.isNullOrBlank()) return
+        viewModelScope.launch(dispatcher) {
+            try {
+                gastoRepo.update(
+                    Gasto(
+                        id = id,
+                        descricao = descricao.trim(),
+                        valor = Money(valorCentavos),
+                        pagadorId = pagadorId,
+                        groupId = groupId,
+                        competencia = competencia
+                    )
+                )
+                val current = (_state.value as? GastosUiState.Ready)?.competencia ?: competenciaInicial
+                _state.value = buildReady(current)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.value = GastosUiState.Error(e.message ?: "Erro ao editar gasto")
+            }
+        }
+    }
+
+    fun remover(id: String) {
+        if (id.isBlank()) return
+        viewModelScope.launch(dispatcher) {
+            try {
+                gastoRepo.delete(id)
+                val current = (_state.value as? GastosUiState.Ready)?.competencia ?: competenciaInicial
+                _state.value = buildReady(current)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _state.value = GastosUiState.Error(e.message ?: "Erro ao excluir gasto")
             }
         }
     }

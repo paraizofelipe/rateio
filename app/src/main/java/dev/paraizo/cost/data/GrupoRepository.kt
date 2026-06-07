@@ -29,7 +29,7 @@ class GrupoRepository(private val client: AppwriteClient) : GrupoRepo {
         return result.documents.map { grupoFromDocument(it.id, it.data as Map<String, Any>) }
     }
 
-    suspend fun update(grupo: Grupo): Grupo {
+    override suspend fun update(grupo: Grupo): Grupo {
         val doc = client.databases.updateDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GRUPOS,
@@ -40,7 +40,7 @@ class GrupoRepository(private val client: AppwriteClient) : GrupoRepo {
         return grupoFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun delete(id: String) {
+    override suspend fun delete(id: String) {
         client.databases.deleteDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GRUPOS,

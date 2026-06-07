@@ -33,7 +33,17 @@ class GastoRepository(private val client: AppwriteClient) : GastoRepo {
         return result.documents.map { gastoFromDocument(it.id, it.data as Map<String, Any>) }
     }
 
-    suspend fun update(gasto: Gasto): Gasto {
+    override suspend fun listByGroup(groupId: String): List<Gasto> {
+        val result = client.databases.listDocuments(
+            databaseId = AppwriteConfig.DATABASE_ID,
+            collectionId = AppwriteConfig.COLLECTION_GASTOS,
+            queries = listOf(Query.equal("groupId", groupId), Query.limit(500))
+        )
+        @Suppress("UNCHECKED_CAST")
+        return result.documents.map { gastoFromDocument(it.id, it.data as Map<String, Any>) }
+    }
+
+    override suspend fun update(gasto: Gasto): Gasto {
         val doc = client.databases.updateDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GASTOS,
@@ -44,7 +54,7 @@ class GastoRepository(private val client: AppwriteClient) : GastoRepo {
         return gastoFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun delete(id: String) {
+    override suspend fun delete(id: String) {
         client.databases.deleteDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GASTOS,

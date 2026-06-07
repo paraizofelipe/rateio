@@ -14,6 +14,7 @@ import dev.paraizo.cost.data.AppwriteClient
 import dev.paraizo.cost.data.GastoRepository
 import dev.paraizo.cost.data.GrupoRepository
 import dev.paraizo.cost.data.PessoaRepository
+import dev.paraizo.cost.data.RendaMensalRepository
 import dev.paraizo.cost.ui.auth.AuthState
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.auth.LoginScreen
@@ -63,11 +64,16 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
             val gruposViewModel: GruposViewModel = viewModel(
                 factory = viewModelFactory {
                     initializer {
-                        GruposViewModel(GrupoRepository(appwriteClient))
+                        GruposViewModel(
+                            GrupoRepository(appwriteClient),
+                            PessoaRepository(appwriteClient),
+                            GastoRepository(appwriteClient)
+                        )
                     }
                 }
             )
             val gruposState by gruposViewModel.state.collectAsStateWithLifecycle()
+            val gruposExclusao by gruposViewModel.exclusao.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
                 gruposViewModel.load()
@@ -76,7 +82,12 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
             GruposScreen(
                 state = gruposState,
                 onCriar = { nome -> gruposViewModel.criar(nome) },
-                onSelecionar = { groupId -> navController.navigate(Routes.pessoas(groupId)) }
+                onSelecionar = { groupId -> navController.navigate(Routes.pessoas(groupId)) },
+                onEditar = { id, nome -> gruposViewModel.editar(id, nome) },
+                exclusao = gruposExclusao,
+                onPrepararExclusao = { grupo -> gruposViewModel.prepararExclusao(grupo) },
+                onConfirmarExclusao = { gruposViewModel.confirmarExclusao() },
+                onCancelarExclusao = { gruposViewModel.cancelarExclusao() }
             )
         }
         composable(Routes.PESSOAS) { backStackEntry ->
@@ -85,11 +96,16 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 key = groupId,
                 factory = viewModelFactory {
                     initializer {
-                        PessoasViewModel(PessoaRepository(appwriteClient), groupId)
+                        PessoasViewModel(
+                            PessoaRepository(appwriteClient),
+                            GastoRepository(appwriteClient),
+                            groupId
+                        )
                     }
                 }
             )
             val pessoasState by pessoasViewModel.state.collectAsStateWithLifecycle()
+            val pessoasExclusao by pessoasViewModel.exclusao.collectAsStateWithLifecycle()
 
             LaunchedEffect(groupId) {
                 pessoasViewModel.load()
@@ -97,7 +113,14 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
 
             PessoasScreen(
                 state = pessoasState,
-                onSalvar = { nome, rendaCentavos -> pessoasViewModel.salvar(nome, rendaCentavos) }
+                onSalvar = { nome, rendaCentavos -> pessoasViewModel.salvar(nome, rendaCentavos) },
+                onAbrirGastos = { navController.navigate(Routes.gastos(groupId)) },
+                onBack = { navController.popBackStack() },
+                onEditar = { id, nome, rendaCentavos -> pessoasViewModel.editar(id, nome, rendaCentavos) },
+                exclusao = pessoasExclusao,
+                onPrepararExclusao = { pessoa -> pessoasViewModel.prepararExclusao(pessoa) },
+                onConfirmarExclusao = { pessoasViewModel.confirmarExclusao() },
+                onCancelarExclusao = { pessoasViewModel.cancelarExclusao() }
             )
         }
         composable(Routes.GASTOS) { backStackEntry ->
@@ -109,6 +132,7 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                         GastosViewModel(
                             GastoRepository(appwriteClient),
                             PessoaRepository(appwriteClient),
+                            RendaMensalRepository(appwriteClient),
                             groupId
                         )
                     }
@@ -128,7 +152,13 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 },
                 onVerSettle = { competencia ->
                     navController.navigate(Routes.settle(groupId, competencia))
-                }
+                },
+                onBack = { navController.popBackStack() },
+                onEditar = { id, descricao, valorCentavos, pagadorId, competencia ->
+                    gastosViewModel.editar(id, descricao, valorCentavos, pagadorId, competencia)
+                },
+                onRemover = { id -> gastosViewModel.remover(id) },
+                onSincronizarRendas = { competencia -> gastosViewModel.sincronizarRendas(competencia) }
             )
         }
         composable(Routes.SETTLE) { backStackEntry ->
@@ -141,6 +171,7 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                         SettleViewModel(
                             PessoaRepository(appwriteClient),
                             GastoRepository(appwriteClient),
+                            RendaMensalRepository(appwriteClient),
                             groupId
                         )
                     }
@@ -152,7 +183,7 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 settleViewModel.carregar(competencia)
             }
 
-            SettleScreen(state = settleState)
+            SettleScreen(state = settleState, onBack = { navController.popBackStack() })
         }
     }
 }

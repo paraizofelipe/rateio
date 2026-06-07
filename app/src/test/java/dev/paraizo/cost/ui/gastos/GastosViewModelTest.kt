@@ -2,6 +2,7 @@ package dev.paraizo.cost.ui.gastos
 
 import dev.paraizo.cost.data.GastoRepo
 import dev.paraizo.cost.data.PessoaRepo
+import dev.paraizo.cost.data.RendaMensalRepo
 import dev.paraizo.cost.domain.Gasto
 import dev.paraizo.cost.domain.Money
 import dev.paraizo.cost.domain.Pessoa
@@ -25,6 +26,7 @@ class GastosViewModelTest {
 
     private lateinit var gastoRepo: FakeGastoRepo
     private lateinit var pessoaRepo: FakePessoaRepo
+    private lateinit var rendaRepo: FakeRendaMensalRepo
     private lateinit var viewModel: GastosViewModel
 
     @BeforeTest
@@ -32,7 +34,8 @@ class GastosViewModelTest {
         Dispatchers.setMain(testDispatcher)
         gastoRepo = FakeGastoRepo()
         pessoaRepo = FakePessoaRepo()
-        viewModel = GastosViewModel(gastoRepo, pessoaRepo, "g1", testDispatcher)
+        rendaRepo = FakeRendaMensalRepo()
+        viewModel = GastosViewModel(gastoRepo, pessoaRepo, rendaRepo, "g1", testDispatcher)
     }
 
     @AfterTest
@@ -120,6 +123,69 @@ class GastosViewModelTest {
         assertTrue(state is GastosUiState.Ready)
         assertEquals(2, state.pessoas.size)
     }
+
+    @Test
+    fun editarGastoValidoChamaUpdateERecarrega() = runTest(testDispatcher) {
+        gastoRepo.gastosPorCompetencia = mapOf(
+            "2026-06" to listOf(Gasto("b", "Luz", Money(8000), "p1", "g1", "2026-06"))
+        )
+        viewModel.selecionarCompetencia("2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.editar("b", "Luz e força", 9000L, "p1", "2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals("Luz e força", gastoRepo.updated?.descricao)
+        assertEquals("b", gastoRepo.updated?.id)
+    }
+
+    @Test
+    fun editarComIdVazioNaoChama() = runTest(testDispatcher) {
+        viewModel.editar("", "Luz", 9000L, "p1", "2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(gastoRepo.updateCalled)
+    }
+
+    @Test
+    fun removerGastoChamaDeleteERecarrega() = runTest(testDispatcher) {
+        gastoRepo.gastosPorCompetencia = mapOf(
+            "2026-06" to listOf(Gasto("b", "Luz", Money(8000), "p1", "g1", "2026-06"))
+        )
+        viewModel.selecionarCompetencia("2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.remover("b")
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(gastoRepo.deletados.contains("b"))
+    }
+
+    @Test
+    fun criarPrimeiroGastoDoMesFotografaRendas() = runTest(testDispatcher) {
+        pessoaRepo.pessoas = listOf(
+            Pessoa("p1", "Ana", Money(6000), "g1"),
+            Pessoa("p2", "Bob", Money(4000), "g1")
+        )
+        viewModel.criar("Aluguel", 150000L, "p1", "2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        val snapshot = rendaRepo.snapshots["2026-06"]
+        assertEquals(mapOf("p1" to 6000L, "p2" to 4000L), snapshot)
+    }
+
+    @Test
+    fun criarSegundoGastoNaoRefotografa() = runTest(testDispatcher) {
+        pessoaRepo.pessoas = listOf(Pessoa("p1", "Ana", Money(6000), "g1"))
+        rendaRepo.snapshots = mutableMapOf("2026-06" to mapOf("p1" to 5000L))
+        viewModel.criar("Aluguel", 150000L, "p1", "2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        // Mantém a foto original (5000), não sobrescreve com a renda atual (6000)
+        assertEquals(mapOf("p1" to 5000L), rendaRepo.snapshots["2026-06"])
+    }
+
+    @Test
+    fun sincronizarRendasRefotografaComRendasAtuais() = runTest(testDispatcher) {
+        pessoaRepo.pessoas = listOf(Pessoa("p1", "Ana", Money(8000), "g1"))
+        rendaRepo.snapshots = mutableMapOf("2026-06" to mapOf("p1" to 5000L))
+        viewModel.sincronizarRendas("2026-06")
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertEquals(mapOf("p1" to 8000L), rendaRepo.snapshots["2026-06"])
+    }
 }
 
 private class FakeGastoRepo : GastoRepo {
@@ -127,6 +193,9 @@ private class FakeGastoRepo : GastoRepo {
     var listError: Throwable? = null
     var createCalled: Boolean = false
     var nextCreated: Gasto = Gasto("new", "Novo", Money(1000), "p1", "g1", "2026-06")
+    var updated: Gasto? = null
+    var updateCalled: Boolean = false
+    val deletados = mutableListOf<String>()
 
     override suspend fun create(gasto: Gasto): Gasto {
         createCalled = true
@@ -141,6 +210,22 @@ private class FakeGastoRepo : GastoRepo {
         listError?.let { throw it }
         return gastosPorCompetencia[competencia] ?: emptyList()
     }
+
+    override suspend fun listByGroup(groupId: String): List<Gasto> {
+        listError?.let { throw it }
+        return gastosPorCompetencia.values.flatten()
+    }
+
+    override suspend fun update(gasto: Gasto): Gasto {
+        updateCalled = true
+        updated = gasto
+        return gasto
+    }
+
+    override suspend fun delete(id: String) {
+        deletados += id
+        gastosPorCompetencia = gastosPorCompetencia.mapValues { (_, list) -> list.filterNot { it.id == id } }
+    }
 }
 
 private class FakePessoaRepo : PessoaRepo {
@@ -149,4 +234,20 @@ private class FakePessoaRepo : PessoaRepo {
     override suspend fun create(pessoa: Pessoa): Pessoa = pessoa
     override suspend fun listByGroup(groupId: String): List<Pessoa> = pessoas
     override suspend fun update(pessoa: Pessoa): Pessoa = pessoa
+    override suspend fun delete(id: String) {}
+}
+
+private class FakeRendaMensalRepo : RendaMensalRepo {
+    var snapshots: MutableMap<String, Map<String, Long>> = mutableMapOf()
+
+    override suspend fun rendasDe(groupId: String, competencia: String): Map<String, Long> =
+        snapshots[competencia] ?: emptyMap()
+
+    override suspend fun criarSnapshot(groupId: String, competencia: String, rendas: Map<String, Long>) {
+        snapshots[competencia] = rendas
+    }
+
+    override suspend fun limparSnapshot(groupId: String, competencia: String) {
+        snapshots.remove(competencia)
+    }
 }

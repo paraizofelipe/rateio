@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -15,13 +14,14 @@ import dev.paraizo.cost.data.AppwriteClient
 import dev.paraizo.cost.ui.auth.AppwriteAuthGateway
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.nav.AppNav
+import dev.paraizo.cost.ui.theme.CostTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
+            CostTheme {
                 Surface {
                     val client = remember { AppwriteClient(applicationContext) }
                     val gateway = remember { AppwriteAuthGateway(client.account) }

@@ -40,7 +40,7 @@ class PessoaRepository(private val client: AppwriteClient) : PessoaRepo {
         return pessoaFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun delete(id: String) {
+    override suspend fun delete(id: String) {
         client.databases.deleteDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_PESSOAS,

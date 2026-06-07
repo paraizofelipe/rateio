@@ -6,4 +6,6 @@ import dev.paraizo.cost.domain.Grupo
 interface GrupoRepo {
     suspend fun create(grupo: Grupo): Grupo
     suspend fun list(): List<Grupo>
+    suspend fun update(grupo: Grupo): Grupo
+    suspend fun delete(id: String)
 }
