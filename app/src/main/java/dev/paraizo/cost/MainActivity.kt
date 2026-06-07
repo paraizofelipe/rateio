@@ -14,14 +14,14 @@ import dev.paraizo.cost.data.AppwriteClient
 import dev.paraizo.cost.ui.auth.AppwriteAuthGateway
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.nav.AppNav
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CostTheme {
+            RateioTheme {
                 Surface {
                     val client = remember { AppwriteClient(applicationContext) }
                     val gateway = remember { AppwriteAuthGateway(client.account) }

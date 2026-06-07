@@ -47,7 +47,7 @@ import dev.paraizo.cost.domain.Grupo
 import dev.paraizo.cost.ui.common.BrandFab
 import dev.paraizo.cost.ui.common.EmptyState
 import dev.paraizo.cost.ui.common.ItemActionsMenu
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +64,7 @@ fun GruposScreen(
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var grupoEmEdicaoId by rememberSaveable { mutableStateOf<String?>(null) }
     var nomeInput by rememberSaveable { mutableStateOf("") }
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
 
     fun abrirCriacao() {
         grupoEmEdicaoId = null
@@ -193,7 +193,7 @@ private fun GruposList(
     onEditar: (Grupo) -> Unit,
     onExcluir: (Grupo) -> Unit,
 ) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     var menuParaId by rememberSaveable { mutableStateOf<String?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {

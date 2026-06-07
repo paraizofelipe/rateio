@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 
 /** Cor pastel determinística a partir do nome — espelha o hsl(...) do protótipo. */
 fun avatarColor(seed: String): Color {
@@ -67,8 +67,8 @@ fun InitialAvatar(name: String, size: Dp = 42.dp, modifier: Modifier = Modifier)
 fun Pill(
     text: String,
     modifier: Modifier = Modifier,
-    background: Color = CostTheme.extras.pillBg,
-    contentColor: Color = CostTheme.extras.pillText,
+    background: Color = RateioTheme.extras.pillBg,
+    contentColor: Color = RateioTheme.extras.pillText,
 ) {
     Box(
         modifier = modifier
@@ -92,7 +92,7 @@ fun BrandFab(
         modifier = modifier
             .size(56.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(CostTheme.extras.brandGradient)
+            .background(RateioTheme.extras.brandGradient)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
@@ -121,7 +121,7 @@ fun BrandButton(
     ) {
         Box(
             modifier = Modifier
-                .then(if (enabled) Modifier.background(CostTheme.extras.brandGradient) else Modifier)
+                .then(if (enabled) Modifier.background(RateioTheme.extras.brandGradient) else Modifier)
                 .fillMaxWidth()
                 .padding(vertical = 13.dp),
             contentAlignment = Alignment.Center,
@@ -171,12 +171,12 @@ fun EmptyState(
         Icon(
             icon,
             contentDescription = null,
-            tint = CostTheme.extras.emptyIcon,
+            tint = RateioTheme.extras.emptyIcon,
             modifier = Modifier.size(64.dp),
         )
         Spacer(Modifier.height(16.dp))
-        Text(title, color = CostTheme.extras.textSecondary, fontSize = 15.sp)
+        Text(title, color = RateioTheme.extras.textSecondary, fontSize = 15.sp)
         Spacer(Modifier.height(4.dp))
-        Text(subtitle, color = CostTheme.extras.textMuted, fontSize = 13.sp)
+        Text(subtitle, color = RateioTheme.extras.textMuted, fontSize = 13.sp)
     }
 }

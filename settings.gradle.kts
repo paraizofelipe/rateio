@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cost"
+rootProject.name = "Rateio"
 include(":app")

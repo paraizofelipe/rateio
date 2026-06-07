@@ -43,7 +43,7 @@ import dev.paraizo.cost.domain.Pessoa
 import dev.paraizo.cost.ui.common.InitialAvatar
 import dev.paraizo.cost.ui.common.Pill
 import dev.paraizo.cost.ui.common.formatReais
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +57,7 @@ fun SettleScreen(state: SettleUiState, onBack: () -> Unit = {}) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar", tint = MaterialTheme.colorScheme.primary)
                     }
                 },
-                title = { Text("Acerto de contas", color = CostTheme.extras.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                title = { Text("Acerto de contas", color = RateioTheme.extras.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         }
@@ -72,7 +72,7 @@ fun SettleScreen(state: SettleUiState, onBack: () -> Unit = {}) {
                         BlockReason.SEM_PESSOAS -> "Nenhuma pessoa cadastrada no grupo."
                         BlockReason.RENDA_TOTAL_ZERO -> "A renda total do grupo é zero. Cadastre rendas para calcular o acerto."
                     }
-                    EstadoCentral(icon = Icons.Rounded.Warning, iconTint = CostTheme.extras.warnIcon, titulo = msg, tituloColor = CostTheme.extras.textPrimary)
+                    EstadoCentral(icon = Icons.Rounded.Warning, iconTint = RateioTheme.extras.warnIcon, titulo = msg, tituloColor = RateioTheme.extras.textPrimary)
                 }
 
                 is SettleUiState.Error ->
@@ -84,9 +84,9 @@ fun SettleScreen(state: SettleUiState, onBack: () -> Unit = {}) {
                     if (state.result.transferencias.isEmpty()) {
                         EstadoCentral(
                             icon = Icons.Rounded.CheckCircle,
-                            iconTint = CostTheme.extras.okIcon,
+                            iconTint = RateioTheme.extras.okIcon,
                             titulo = "Tudo certo!",
-                            tituloColor = CostTheme.extras.okText,
+                            tituloColor = RateioTheme.extras.okText,
                             subtitulo = "Ninguém deve nada.",
                         )
                     } else {
@@ -115,14 +115,14 @@ private fun EstadoCentral(
         Text(titulo, color = tituloColor, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         if (subtitulo != null) {
             Spacer(Modifier.height(4.dp))
-            Text(subtitulo, color = CostTheme.extras.textSecondary, fontSize = 14.sp)
+            Text(subtitulo, color = RateioTheme.extras.textSecondary, fontSize = 14.sp)
         }
     }
 }
 
 @Composable
 private fun SettleReadyContent(state: SettleUiState.Ready) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     val pessoasOrdenadas = state.pessoasById.entries.sortedBy { it.value.nome }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -210,7 +210,7 @@ private fun SettleReadyContent(state: SettleUiState.Ready) {
 private fun SecaoTitulo(texto: String) {
     Text(
         texto.uppercase(),
-        color = CostTheme.extras.textSecondary,
+        color = RateioTheme.extras.textSecondary,
         fontSize = 12.sp,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = 0.8.sp,
@@ -220,7 +220,7 @@ private fun SecaoTitulo(texto: String) {
 
 @Composable
 private fun ResumoPessoa(pessoa: Pessoa, devido: Money, pago: Money, saldo: Money) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     val recebe = saldo.cents >= 0L
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -257,7 +257,7 @@ private fun MetricaBox(modifier: Modifier, label: String, valor: String, bg: Col
 
 @Composable
 private fun LinhaTransferencia(de: String, para: String, valor: Money) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

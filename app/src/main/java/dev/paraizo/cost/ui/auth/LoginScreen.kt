@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.paraizo.cost.ui.common.BrandButton
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 
 @Composable
 fun LoginScreen(
@@ -47,7 +47,7 @@ fun LoginScreen(
 
     val isLoading = state is AuthState.Loading
     val errorMessage = (state as? AuthState.Error)?.message
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
 
     Column(
         modifier = Modifier
@@ -76,7 +76,7 @@ fun LoginScreen(
                 )
             }
             Spacer(Modifier.height(16.dp))
-            Text("Cost", color = MaterialTheme.colorScheme.primary, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+            Text("Rateio", color = MaterialTheme.colorScheme.primary, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text("Divisão inteligente de gastos", color = extras.textSecondary, fontSize = 13.sp)
         }

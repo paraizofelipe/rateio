@@ -48,7 +48,7 @@ private val DarkColors = darkColorScheme(
     outline = Slate,
 )
 
-private val CostShapes = Shapes(
+private val RateioShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
     medium = RoundedCornerShape(16.dp),
@@ -61,7 +61,7 @@ private val CostShapes = Shapes(
  * protótipo (cards do acerto, pills, gradiente da marca). Variam entre claro/escuro.
  */
 @Immutable
-data class CostExtras(
+data class RateioExtras(
     val gradientStart: Color,
     val gradientEnd: Color,
     val textPrimary: Color,
@@ -80,7 +80,7 @@ data class CostExtras(
     val brandGradient: Brush get() = Brush.linearGradient(listOf(gradientStart, gradientEnd))
 }
 
-private val LightExtras = CostExtras(
+private val LightExtras = RateioExtras(
     gradientStart = Teal, gradientEnd = TealLight,
     textPrimary = Ink, textSecondary = SlateSecondary, textMuted = GreyMuted,
     emptyIcon = GreyEmptyIcon, card = PaperLight,
@@ -92,7 +92,7 @@ private val LightExtras = CostExtras(
     warnIcon = WarnIcon, okIcon = OkIcon, okText = OkText,
 )
 
-private val DarkExtras = CostExtras(
+private val DarkExtras = RateioExtras(
     gradientStart = TealAStrong, gradientEnd = TealA,
     textPrimary = InkOnDark, textSecondary = SlateMuted, textMuted = Slate,
     emptyIcon = Slate, card = PaperDark,
@@ -104,25 +104,25 @@ private val DarkExtras = CostExtras(
     warnIcon = WarnIcon, okIcon = OkIcon, okText = Color(0xFF81C784),
 )
 
-val LocalCostExtras = staticCompositionLocalOf { LightExtras }
+val LocalRateioExtras = staticCompositionLocalOf { LightExtras }
 
-object CostTheme {
-    val extras: CostExtras
-        @Composable get() = LocalCostExtras.current
+object RateioTheme {
+    val extras: RateioExtras
+        @Composable get() = LocalRateioExtras.current
 }
 
 @Composable
-fun CostTheme(
+fun RateioTheme(
     darkTheme: Boolean = androidx.compose.foundation.isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
     val colors = if (darkTheme) DarkColors else LightColors
     val extras = if (darkTheme) DarkExtras else LightExtras
-    androidx.compose.runtime.CompositionLocalProvider(LocalCostExtras provides extras) {
+    androidx.compose.runtime.CompositionLocalProvider(LocalRateioExtras provides extras) {
         MaterialTheme(
             colorScheme = colors,
-            shapes = CostShapes,
-            typography = CostTypography,
+            shapes = RateioShapes,
+            typography = RateioTypography,
             content = content,
         )
     }

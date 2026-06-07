@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.sp
  * Tipografia alinhada ao protótipo: títulos com peso forte e botões sem
  * caixa-alta (textTransform: none no MUI).
  */
-val CostTypography = Typography(
+val RateioTypography = Typography(
     headlineMedium = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp),
     headlineSmall = TextStyle(fontSize = 26.sp, fontWeight = FontWeight.SemiBold),
     titleLarge = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold),

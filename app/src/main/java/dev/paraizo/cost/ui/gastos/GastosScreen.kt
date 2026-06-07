@@ -64,7 +64,7 @@ import dev.paraizo.cost.ui.common.ItemActionsMenu
 import dev.paraizo.cost.ui.common.MoneyField
 import dev.paraizo.cost.ui.common.formatReais
 import dev.paraizo.cost.ui.common.parseCentavos
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
@@ -88,7 +88,7 @@ fun GastosScreen(
     var gastoParaExcluir by remember { mutableStateOf<Gasto?>(null) }
     var topMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var showSyncConfirm by rememberSaveable { mutableStateOf(false) }
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
 
     val competencia = (state as? GastosUiState.Ready)?.competencia ?: ""
     val pessoas = (state as? GastosUiState.Ready)?.pessoas ?: emptyList()
@@ -350,7 +350,7 @@ private fun GastoDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraLarge,
-        title = { Text(if (editando) "Editar gasto" else "Novo gasto", fontWeight = FontWeight.SemiBold, color = CostTheme.extras.textPrimary) },
+        title = { Text(if (editando) "Editar gasto" else "Novo gasto", fontWeight = FontWeight.SemiBold, color = RateioTheme.extras.textPrimary) },
         text = {
             Column {
                 OutlinedTextField(
@@ -416,7 +416,7 @@ private fun GastosList(
     onEditar: (Gasto) -> Unit,
     onExcluir: (Gasto) -> Unit,
 ) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     val pessoasPorId = pessoas.associateBy { it.id }
     var menuParaId by rememberSaveable { mutableStateOf<String?>(null) }
 

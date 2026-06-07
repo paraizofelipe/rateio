@@ -55,7 +55,7 @@ import dev.paraizo.cost.ui.common.ItemActionsMenu
 import dev.paraizo.cost.ui.common.MoneyField
 import dev.paraizo.cost.ui.common.formatReais
 import dev.paraizo.cost.ui.common.parseCentavos
-import dev.paraizo.cost.ui.theme.CostTheme
+import dev.paraizo.cost.ui.theme.RateioTheme
 import java.math.RoundingMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +75,7 @@ fun PessoasScreen(
     var pessoaEmEdicaoId by rememberSaveable { mutableStateOf<String?>(null) }
     var nomeInput by rememberSaveable { mutableStateOf("") }
     var rendaInput by rememberSaveable { mutableStateOf("") }
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
 
     fun abrirCriacao() {
         pessoaEmEdicaoId = null
@@ -254,7 +254,7 @@ private fun PessoasList(
     onEditar: (Pessoa) -> Unit,
     onExcluir: (Pessoa) -> Unit,
 ) {
-    val extras = CostTheme.extras
+    val extras = RateioTheme.extras
     var menuParaId by rememberSaveable { mutableStateOf<String?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
