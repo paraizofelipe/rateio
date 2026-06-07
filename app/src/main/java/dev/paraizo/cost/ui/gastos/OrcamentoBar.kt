@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -59,7 +60,12 @@ fun OrcamentoBar(orcamento: OrcamentoMensal, modifier: Modifier = Modifier) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth()) {
             HorizontalDivider(color = extras.textMuted.copy(alpha = 0.2f))
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            ) {
                 Text(rotulo, color = extras.textSecondary, fontSize = 13.sp)
                 Spacer(Modifier.height(8.dp))
                 Box(
