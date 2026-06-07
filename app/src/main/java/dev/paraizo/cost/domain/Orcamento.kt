@@ -1,5 +1,8 @@
 package dev.paraizo.cost.domain
 
+private const val LIMIAR_ATENCAO = 0.60   // a partir de 60% gasto -> atenção
+private const val LIMIAR_CRITICO = 0.85   // acima de 85% gasto -> crítico
+
 /** Termômetro de consumo da renda no mês. Verde/amarela/vermelha por % gasto; cinza sem renda. */
 enum class NivelOrcamento { SAUDAVEL, ATENCAO, CRITICO, SEM_RENDA }
 
@@ -22,6 +25,7 @@ fun calcularOrcamento(rendaTotal: Money, totalGasto: Money): OrcamentoMensal {
             rendaTotal = rendaTotal,
             totalGasto = totalGasto,
             restante = Money.ZERO,
+            // Sem renda definida não há base para "estourar"; excedente fica zero (a UI mostra "Sem renda").
             excedente = Money.ZERO,
             fracaoRestante = 0f,
             nivel = NivelOrcamento.SEM_RENDA,
@@ -32,8 +36,8 @@ fun calcularOrcamento(rendaTotal: Money, totalGasto: Money): OrcamentoMensal {
     val fracao = (restanteCents.toDouble() / rendaTotal.cents.toDouble()).toFloat().coerceIn(0f, 1f)
     val percentualGasto = totalGasto.cents.toDouble() / rendaTotal.cents.toDouble()
     val nivel = when {
-        percentualGasto < 0.60 -> NivelOrcamento.SAUDAVEL
-        percentualGasto <= 0.85 -> NivelOrcamento.ATENCAO
+        percentualGasto < LIMIAR_ATENCAO -> NivelOrcamento.SAUDAVEL
+        percentualGasto <= LIMIAR_CRITICO -> NivelOrcamento.ATENCAO
         else -> NivelOrcamento.CRITICO
     }
     return OrcamentoMensal(

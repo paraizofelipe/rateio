@@ -35,7 +35,7 @@ class OrcamentoTest {
     }
 
     @Test
-    fun gasto86PorCentoCritico() {
+    fun gastoAcimaDe85PorCentoCritico() {
         val o = calcularOrcamento(Money(1000), Money(851))
         assertEquals(NivelOrcamento.CRITICO, o.nivel)
     }
