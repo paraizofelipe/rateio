@@ -6,9 +6,9 @@ import dev.paraizo.cost.domain.Gasto
 import io.appwrite.ID
 import io.appwrite.Query
 
-class GastoRepository(private val client: AppwriteClient) {
+class GastoRepository(private val client: AppwriteClient) : GastoRepo {
 
-    suspend fun create(gasto: Gasto): Gasto {
+    override suspend fun create(gasto: Gasto): Gasto {
         val doc = client.databases.createDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GASTOS,
@@ -19,7 +19,7 @@ class GastoRepository(private val client: AppwriteClient) {
         return gastoFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun listByGroupAndCompetencia(groupId: String, competencia: String): List<Gasto> {
+    override suspend fun listByGroupAndCompetencia(groupId: String, competencia: String): List<Gasto> {
         val result = client.databases.listDocuments(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GASTOS,

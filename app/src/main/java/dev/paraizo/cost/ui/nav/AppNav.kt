@@ -12,11 +12,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.paraizo.cost.data.AppwriteClient
+import dev.paraizo.cost.data.GastoRepository
 import dev.paraizo.cost.data.GrupoRepository
 import dev.paraizo.cost.data.PessoaRepository
 import dev.paraizo.cost.ui.auth.AuthState
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.auth.LoginScreen
+import dev.paraizo.cost.ui.gastos.GastosScreen
+import dev.paraizo.cost.ui.gastos.GastosViewModel
 import dev.paraizo.cost.ui.grupos.GruposScreen
 import dev.paraizo.cost.ui.grupos.GruposViewModel
 import dev.paraizo.cost.ui.pessoas.PessoasScreen
@@ -96,8 +99,33 @@ fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
                 onSalvar = { nome, rendaCentavos -> pessoasViewModel.salvar(nome, rendaCentavos) }
             )
         }
-        composable(Routes.GASTOS) {
-            Text("Gastos")
+        composable(Routes.GASTOS) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getString("groupId") ?: return@composable
+            val gastosViewModel: GastosViewModel = viewModel(
+                key = groupId,
+                factory = viewModelFactory {
+                    initializer {
+                        GastosViewModel(
+                            GastoRepository(appwriteClient),
+                            PessoaRepository(appwriteClient),
+                            groupId
+                        )
+                    }
+                }
+            )
+            val gastosState by gastosViewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(groupId) {
+                gastosViewModel.load()
+            }
+
+            GastosScreen(
+                state = gastosState,
+                onSelecionarCompetencia = { gastosViewModel.selecionarCompetencia(it) },
+                onCriar = { descricao, valorCentavos, pagadorId, competencia ->
+                    gastosViewModel.criar(descricao, valorCentavos, pagadorId, competencia)
+                }
+            )
         }
         composable(Routes.SETTLE) {
             Text("Settle")
