@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,8 +26,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(viewModel: AuthViewModel) {
-    val state by viewModel.state.collectAsState()
+fun LoginScreen(
+    state: AuthState,
+    onLogin: (email: String, senha: String) -> Unit
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var senha by rememberSaveable { mutableStateOf("") }
 
@@ -85,7 +86,7 @@ fun LoginScreen(viewModel: AuthViewModel) {
             CircularProgressIndicator(modifier = Modifier.size(48.dp))
         } else {
             Button(
-                onClick = { viewModel.login(email, senha) },
+                onClick = { onLogin(email, senha) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Entrar")
