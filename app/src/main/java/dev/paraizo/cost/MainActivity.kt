@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                         authViewModel.checkSession()
                     }
 
-                    AppNav(authViewModel = authViewModel)
+                    AppNav(authViewModel = authViewModel, appwriteClient = client)
                 }
             }
         }

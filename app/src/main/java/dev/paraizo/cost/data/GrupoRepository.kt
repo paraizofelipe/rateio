@@ -6,9 +6,9 @@ import dev.paraizo.cost.domain.Grupo
 import io.appwrite.ID
 import io.appwrite.Query
 
-class GrupoRepository(private val client: AppwriteClient) {
+class GrupoRepository(private val client: AppwriteClient) : GrupoRepo {
 
-    suspend fun create(grupo: Grupo): Grupo {
+    override suspend fun create(grupo: Grupo): Grupo {
         val doc = client.databases.createDocument(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GRUPOS,
@@ -19,7 +19,7 @@ class GrupoRepository(private val client: AppwriteClient) {
         return grupoFromDocument(doc.id, doc.data as Map<String, Any>)
     }
 
-    suspend fun list(): List<Grupo> {
+    override suspend fun list(): List<Grupo> {
         val result = client.databases.listDocuments(
             databaseId = AppwriteConfig.DATABASE_ID,
             collectionId = AppwriteConfig.COLLECTION_GRUPOS,

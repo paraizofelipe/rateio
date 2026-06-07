@@ -5,15 +5,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dev.paraizo.cost.data.AppwriteClient
+import dev.paraizo.cost.data.GrupoRepository
 import dev.paraizo.cost.ui.auth.AuthState
 import dev.paraizo.cost.ui.auth.AuthViewModel
 import dev.paraizo.cost.ui.auth.LoginScreen
+import dev.paraizo.cost.ui.grupos.GruposScreen
+import dev.paraizo.cost.ui.grupos.GruposViewModel
 
 @Composable
-fun AppNav(authViewModel: AuthViewModel) {
+fun AppNav(authViewModel: AuthViewModel, appwriteClient: AppwriteClient) {
     val state by authViewModel.state.collectAsStateWithLifecycle()
     val navController = rememberNavController()
 
@@ -46,7 +53,24 @@ fun AppNav(authViewModel: AuthViewModel) {
             )
         }
         composable(Routes.GRUPOS) {
-            Text("Grupos")
+            val gruposViewModel: GruposViewModel = viewModel(
+                factory = viewModelFactory {
+                    initializer {
+                        GruposViewModel(GrupoRepository(appwriteClient))
+                    }
+                }
+            )
+            val gruposState by gruposViewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(Unit) {
+                gruposViewModel.load()
+            }
+
+            GruposScreen(
+                state = gruposState,
+                onCriar = { nome -> gruposViewModel.criar(nome) },
+                onSelecionar = { groupId -> navController.navigate(Routes.pessoas(groupId)) }
+            )
         }
         composable(Routes.PESSOAS) {
             Text("Pessoas")
